@@ -12,6 +12,21 @@
 
 // TODO 1: Create a struct needed to hold the information to Map node
 
+enum map_orientation {
+	ORIENTATION_ORTHOGONAL,
+	ORIENTATION_ISOMETRIC
+};
+
+enum map_renderorder {
+	RENDER_RIGHT_DOWN,
+	RENDER_LEFT_DOWN,
+	RENDER_RIGHT_UP,
+	RENDER_LEFT_UP
+};
+
+
+
+
 // ----------------------------------------------------
 class j1Map : public j1Module
 {
@@ -39,6 +54,17 @@ private:
 public:
 
 	// TODO 1: Add your struct for map info as public for now
+
+	struct Map_Info {
+		p2SString version = "1.0";
+		map_orientation orientation = ORIENTATION_ORTHOGONAL;
+		map_renderorder renderorder = RENDER_RIGHT_DOWN;
+		uint	width =				50,
+				height =			15,
+				tilewidth =			32,
+				tileheight =		32,
+				nextobjectid =		1;
+	};
 
 private:
 
