@@ -5,26 +5,59 @@
 #include "p2List.h"
 #include "p2Point.h"
 #include "j1Module.h"
+#include "p2DynArray.h"
 
 // TODO 2: Create a struct to hold information for a TileSet
 // Ignore Terrain Types and Tile Types for now, but we want the image!
+struct tmx_image_info {
+	p2SString	source;
+	uint		width,
+		height;
+};
 
+struct tmx_tileset_info {
+	uint		firstgid;
+	p2SString	name;
+	uint		tilewidth,
+				tileheight,
+				spacing,
+				margin,
+				tilecount,
+				columns;
+
+	tmx_image_info image;
+};
 
 // TODO 1: Create a struct needed to hold the information to Map node
 
-enum map_orientation {
-	ORIENTATION_ORTHOGONAL,
-	ORIENTATION_ISOMETRIC
+struct tmx_map_info {
+	enum map_orientation {
+		ORIENTATION_ERROR = -1,
+		ORIENTATION_ORTHOGONAL,
+		ORIENTATION_ISOMETRIC
+	};
+
+	enum map_renderorder {
+		RENDER_ERROR = -1,
+		RENDER_RIGHT_DOWN,
+		RENDER_LEFT_DOWN,
+		RENDER_RIGHT_UP,
+		RENDER_LEFT_UP
+	};
+
+	p2SString	version;
+	map_orientation orientation;
+	map_renderorder renderorder;
+	uint		width,
+				height,
+				tilewidth,
+				tileheight,
+				nextobjectid;
+
+	tmx_tileset_info tileset;
+
+	p2DynArray<uint> tile_id_array;
 };
-
-enum map_renderorder {
-	RENDER_RIGHT_DOWN,
-	RENDER_LEFT_DOWN,
-	RENDER_RIGHT_UP,
-	RENDER_LEFT_UP
-};
-
-
 
 
 // ----------------------------------------------------
@@ -51,20 +84,12 @@ public:
 
 private:
 
+	tmx_map_info FillMapInfo(const pugi::xml_document& map_doc);
+
 public:
 
 	// TODO 1: Add your struct for map info as public for now
-
-	struct Map_Info {
-		p2SString version = "1.0";
-		map_orientation orientation = ORIENTATION_ORTHOGONAL;
-		map_renderorder renderorder = RENDER_RIGHT_DOWN;
-		uint	width =				50,
-				height =			15,
-				tilewidth =			32,
-				tileheight =		32,
-				nextobjectid =		1;
-	};
+	tmx_map_info map_info;
 
 private:
 

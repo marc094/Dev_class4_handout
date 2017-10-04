@@ -75,6 +75,7 @@ bool j1Map::Load(const char* file_name)
 	{
 		// TODO 3: Create and call a private function to load and fill
 		// all your map data
+		map_info = FillMapInfo(map_file); //Preguntar tema de pas per referencia / pas per copia!!!
 	}
 
 	// TODO 4: Create and call a private function to load a tileset
@@ -87,4 +88,61 @@ bool j1Map::Load(const char* file_name)
 	map_loaded = ret;
 
 	return ret;
+}
+
+tmx_map_info j1Map::FillMapInfo(const pugi::xml_document& map_doc) {
+	tmx_map_info map;
+	pugi::xml_node node = map_doc.child("map");
+	pugi::xml_node tileset = node.child("tileset");
+	pugi::xml_node image = tileset.child("image");
+	pugi::xml_node layer = tileset.next_sibling();
+	pugi::xml_node layer_data = layer.first_child();
+
+	map.version = node.attribute("version").as_string();
+	p2SString orientation = node.attribute("orientation").as_string();
+	if (orientation == "orthogonal") {
+		map.orientation = tmx_map_info::map_orientation::ORIENTATION_ORTHOGONAL;
+	}
+	else if (orientation == "isometric") {
+		map.orientation = tmx_map_info::map_orientation::ORIENTATION_ISOMETRIC;
+	}
+
+	p2SString render_order = node.attribute("renderorder").as_string();
+	if (render_order == "right-down") {
+		map.renderorder = tmx_map_info::map_renderorder::RENDER_RIGHT_DOWN;
+	}
+	else if (render_order == "right-up") {
+		map.renderorder = tmx_map_info::map_renderorder::RENDER_RIGHT_UP;
+	}
+	else if (render_order == "left-down") {
+		map.renderorder = tmx_map_info::map_renderorder::RENDER_LEFT_DOWN;
+	}
+	else if (render_order == "left-up") {
+		map.renderorder = tmx_map_info::map_renderorder::RENDER_LEFT_UP;
+	}
+
+	map.width = node.attribute("width").as_uint();
+	map.height = node.attribute("height").as_uint();
+	map.tilewidth = node.attribute("tilewidth").as_uint();
+	map.tileheight = node.attribute("tileheight").as_uint();
+	map.nextobjectid = node.attribute("nextobjectid").as_uint();
+
+	map.tileset.firstgid = tileset.attribute("firstgid").as_uint();
+	map.tileset.name = tileset.attribute("name").as_string();
+	map.tileset.tilewidth = tileset.attribute("tilewidth").as_uint();
+	map.tileset.tileheight = tileset.attribute("tileheight").as_uint();
+	map.tileset.spacing = tileset.attribute("spacing").as_uint();
+	map.tileset.margin = tileset.attribute("margin").as_uint();
+	map.tileset.tilecount = tileset.attribute("tilecount").as_uint();
+	map.tileset.columns = tileset.attribute("columns").as_uint();
+
+	map.tileset.image.source = image.attribute("source").as_string();
+	map.tileset.image.width = image.attribute("width").as_int();
+	map.tileset.image.height = image.attribute("height").as_int();
+
+	for (pugi::xml_node tile : layer_data.children()) {
+		map.tile_id_array.PushBack(tile.first_attribute().as_uint());
+	}
+
+	return map;
 }
